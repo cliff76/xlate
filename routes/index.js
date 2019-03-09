@@ -34,7 +34,7 @@ if(! bearerToken) authenticate();
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
-  res.render('index', { title: 'Express' });
+  res.render('index', { title: 'Translation' });
 });
 
 function doTranslate(from, input) {
@@ -63,8 +63,7 @@ function doTranslate(from, input) {
 /* GET translation page. */
 router.get('/xlate', function(req, res, next) {
   if(! bearerToken) authenticate();
-
-    doTranslate('kor', 'Nice to meet you!').then(result => {
+    doTranslate('kor', req.query.toxlate).then(result => {
         res.render('xlate', { translation: result});
     });
 });

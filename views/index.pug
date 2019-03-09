@@ -3,3 +3,8 @@ extends layout
 block content
   h1= title
   p Welcome to #{title}
+  br
+  form(action='/xlate' method='GET')
+    p Translate:
+    input(type='text'  name='toxlate')
+    input(type='submit')
