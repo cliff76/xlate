@@ -2,7 +2,7 @@ var express = require('express');
 var router = express.Router();
 
 var authenticationURL = 'https://westus.api.cognitive.microsoft.com/sts/v1.0/issueToken';
-var apiURL = 'https://westus.api.cognitive.microsofttranslator.com/translate?api-version=3.0';
+var apiURL = 'https://api.cognitive.microsofttranslator.com/translate?api-version=3.0';
 var apiName = 'SpeechAPI';
 var apiKey1 = 'secretkey1';
 var apiKey2 = 'secretkey2';
@@ -40,15 +40,20 @@ router.get('/', function(req, res, next) {
 function doTranslate(from, input) {
   return request({
     uri: apiURL +'&from=en&to=ko',
-    method: 'GET',
-    body: "",
+    method: 'POST',
+    body: [
+        {"Text":input}
+    ],
+    json: true,
     headers: {
       'Ocp-Apim-Subscription-Key': apiKey1,
       'Authorization': bearerToken
-    }
+    },
   })
       .then(function(response) {
-        console.log('API Response ' + response)
+          translation = response[0].translations[0].text;
+          console.log('API Response ', translation);
+          return translation;
       })
       .catch(function(error) {
         console.log('API Error!', error);
@@ -59,7 +64,9 @@ function doTranslate(from, input) {
 router.get('/xlate', function(req, res, next) {
   if(! bearerToken) authenticate();
 
-  res.render('xlate', { translation: doTranslate('kor', 'Nice to meet you!')});
+    doTranslate('kor', 'Nice to meet you!').then(result => {
+        res.render('xlate', { translation: result});
+    });
 });
 
 module.exports = router;
