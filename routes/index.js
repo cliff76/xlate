@@ -4,8 +4,7 @@ var router = express.Router();
 var authenticationURL = 'https://westus.api.cognitive.microsoft.com/sts/v1.0/issueToken';
 var apiURL = 'https://api.cognitive.microsofttranslator.com/translate?api-version=3.0';
 var apiName = 'SpeechAPI';
-var apiKey1 = 'secretkey1';
-var apiKey2 = 'secretkey2';
+var apiKey1 = process.env.SAPI_KEY;
 
 var bearerToken;
 
