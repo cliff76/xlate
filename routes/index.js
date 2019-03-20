@@ -63,7 +63,13 @@ function doTranslate(from, input) {
 router.get('/xlate', function(req, res, next) {
   if(! bearerToken) authenticate();
     doTranslate('kor', req.query.toxlate).then(result => {
-        res.render('xlate', { translation: result});
+        if (! req.query.format || req.query.format === 'html') {
+            res.render('xlate', {translation: result});
+        } else if(req.query.format === 'text'){
+            res.send(result);
+        } else {
+            res.send('unsupported format query string parameter ' + res.query.format);
+        }
     });
 });
 
