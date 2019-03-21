@@ -72,6 +72,8 @@ router.get('/xlate', function(req, res, next) {
             res.render('xlate', {translation: result});
         } else if(req.query.format === 'text'){
             res.send(result);
+        } else if(req.query.format === 'json'){
+            res.send({translation: result, transliteration: transliterate(result)});
         } else {
             res.send('unsupported format query string parameter ' + res.query.format);
         }
