@@ -9,6 +9,8 @@ var apiKey1 = process.env.SAPI_KEY;
 var bearerToken;
 
 var request = require('request-promise');
+var transliterate = require('transliteration').transliterate;
+
 function authenticate() {
   var options = {
     uri: authenticationURL,
@@ -63,6 +65,9 @@ function doTranslate(from, input) {
 router.get('/xlate', function(req, res, next) {
   if(! bearerToken) authenticate();
     doTranslate('kor', req.query.toxlate).then(result => {
+        if(req.query.transliterate) {
+            result = transliterate(result);
+        }
         if (! req.query.format || req.query.format === 'html') {
             res.render('xlate', {translation: result});
         } else if(req.query.format === 'text'){
