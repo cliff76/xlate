@@ -2,7 +2,7 @@ var express = require('express');
 var router = express.Router();
 
 var authenticationURL = 'https://westus.api.cognitive.microsoft.com/sts/v1.0/issueToken';
-var apiURL = 'https://api.cognitive.microsofttranslator.com/translate?api-version=3.0';
+var bingApiURL = 'https://api.cognitive.microsofttranslator.com/translate?api-version=3.0';
 var apiName = 'SpeechAPI';
 var apiKey1 = process.env.SAPI_KEY;
 
@@ -38,9 +38,11 @@ router.get('/', function(req, res, next) {
   res.render('index', { title: 'Translation' });
 });
 
-function doTranslate(to, input) {
+function doTranslate(to, input, api) {
+    let naverApiURL = "https://openapi.naver.com/v1/language/translate";
+    const uri = api === 'naver' ? naverApiURL : bingApiURL +'&from=en&to=' + to;
   return request({
-    uri: apiURL +'&from=en&to=' + to,
+    uri: bingApiURL +'&from=en&to=' + to,
     method: 'POST',
     body: [
         {"Text":input}
@@ -65,7 +67,8 @@ function doTranslate(to, input) {
 router.get('/xlate', function(req, res, next) {
   if(! bearerToken) authenticate();
     const to = (req.query.to) ? req.query.to : 'ko';
-    doTranslate(to, req.query.toxlate).then(result => {
+    const api = req.query.api ? req.query.api : 'bing';
+    doTranslate(to, req.query.toxlate, api).then(result => {
         if(req.query.transliterate) {
             result = transliterate(result);
         }
