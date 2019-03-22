@@ -2,6 +2,7 @@ var express = require('express');
 var router = express.Router();
 
 var authenticationURL = 'https://westus.api.cognitive.microsoft.com/sts/v1.0/issueToken';
+let naverApiURL = "https://openapi.naver.com/v1/language/translate";
 var bingApiURL = 'https://api.cognitive.microsofttranslator.com/translate?api-version=3.0';
 var apiName = 'SpeechAPI';
 var apiKey1 = process.env.SAPI_KEY;
@@ -38,23 +39,29 @@ router.get('/', function(req, res, next) {
   res.render('index', { title: 'Translation' });
 });
 
+function getBingTranslation(response) {
+    return response[0].translations[0].text;
+}
+
 function doTranslate(to, input, api) {
-    let naverApiURL = "https://openapi.naver.com/v1/language/translate";
-    const uri = api === 'naver' ? naverApiURL : bingApiURL +'&from=en&to=' + to;
-  return request({
-    uri: bingApiURL +'&from=en&to=' + to,
-    method: 'POST',
-    body: [
-        {"Text":input}
-    ],
-    json: true,
-    headers: {
+  const uri = api === 'naver' ? naverApiURL : bingApiURL +'&from=en&to=' + to;
+  const headers = api === 'naver' ? {'X-Naver-Client-Id': 'pdrAJgv_e215VWgXVRyN', 'X-Naver-Client-Secret': 'WnyHdHQ307'
+  } : {
       'Ocp-Apim-Subscription-Key': apiKey1,
       'Authorization': bearerToken
-    },
+  };
+    const body = api === 'naver' ? {source: 'en', target: to, text:input} : [
+        {"Text":input}
+    ];
+  return request({
+    uri: uri,
+    method: 'POST',
+    body: body,
+    json: true,
+    headers: headers,
   })
       .then(function(response) {
-          translation = response[0].translations[0].text;
+          translation = api === 'naver' ? response.message.result.translatedText : getBingTranslation(response);
           console.log('API Response ', translation);
           return translation;
       })
