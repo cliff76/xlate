@@ -38,9 +38,9 @@ router.get('/', function(req, res, next) {
   res.render('index', { title: 'Translation' });
 });
 
-function doTranslate(from, input) {
+function doTranslate(to, input) {
   return request({
-    uri: apiURL +'&from=en&to=ko',
+    uri: apiURL +'&from=en&to=' + to,
     method: 'POST',
     body: [
         {"Text":input}
@@ -64,7 +64,8 @@ function doTranslate(from, input) {
 /* GET translation page. */
 router.get('/xlate', function(req, res, next) {
   if(! bearerToken) authenticate();
-    doTranslate('kor', req.query.toxlate).then(result => {
+    const to = (req.query.to) ? req.query.to : 'ko';
+    doTranslate(to, req.query.toxlate).then(result => {
         if(req.query.transliterate) {
             result = transliterate(result);
         }
